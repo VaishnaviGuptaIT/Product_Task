@@ -1,0 +1,64 @@
+
+:root {
+  /* Core Colors */
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  
+
+  /* Primary Colors */
+  --color-primary: #6366f1;
+  --color-secondary: #8b5cf6;
+  --color-accent: #3b82f6;
+  --color-success: #10b981;
+
+  /* Gradient */
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #3b82f6 100%);
+  --gradient-glow: linear-gradient(
+    rgba(99, 102, 241, 0.3),
+    rgba(139, 92, 246, 0.3),
+    rgba(59, 130, 246, 0.3)
+  );
+  --gradient-surface: linear-gradient(135deg,
+    rgba(30, 41, 59, 0.9),
+    rgba(51, 65, 85, 0.8)
+  );
+
+  /* Neutral Colors */
+  --color-white: #ffffff;
+  --color-gray-50: #f8fafc;
+  --color-gray-300: #cbd5e1;
+  --color-gray-500: #64748b;
+  --color-gray-900: #0f172a;
+
+  /* Transparent Colors */
+  --color-overlay-light: rgba(255, 255, 255, 0.08);
+  --color-overlay-medium: rgba(255, 255, 255, 0.12);
+  --color-overlay-dark: rgba(0, 0, 0, 0.3);
+  --color-primary-opacity: rgba(99, 102, 241, 0.2);
+
+  /* Typography */
+  --font-body: system-ui, sans-serif;
+  --font-heading: sans-serif;
+
+  --text-color-primary: var(--color-white);
+  --text-color-secondary: var(--color-gray-300);
+
+  /* Shadows */
+  --shadow-xl: 0 20px 25px -5px var(--color-overlay-dark);
+  --shadow-glow: 0 0 20px var(--color-primary-opacity);
+
+  /* Blur Effects */
+  --blur-lg: blur(16px);
+  --blur-xl: blur(24px);
+
+  /* Border Radius */
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Animations */
+  --transition-fast: 150ms;
+  --transition-medium: 300ms;
+  --transition-bounce: 500ms;
+}
