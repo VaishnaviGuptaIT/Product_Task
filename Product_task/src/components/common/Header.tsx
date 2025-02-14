@@ -25,7 +25,7 @@ import {
 } from "@mui/icons-material";
 import { LogoutButton } from "./LogoutButton";
 
-// Styled components
+
 const StyledAppBar = styled(AppBar)(() => ({
   background: "var(--color-bg-primary)",
   backdropFilter: "var(--blur-xl)",
@@ -88,7 +88,6 @@ export function Header() {
     <StyledAppBar position="sticky" elevation={0}>
       <Container maxWidth="xl" sx={{ margin: "auto" }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          {/* Logo */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <LogoContainer>
               <Link to="/">
@@ -111,7 +110,6 @@ export function Header() {
             </Link>
           </Box>
 
-          {/* Desktop Navigation */}
           <Box
             sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}
           >
@@ -137,7 +135,6 @@ export function Header() {
             </Box>
           </Box>
 
-          {/* Mobile Menu Button */}
           <IconButton
             sx={{
               display: { xs: "flex", md: "none" },
@@ -153,7 +150,6 @@ export function Header() {
         </Toolbar>
       </Container>
 
-      {/* Mobile Navigation Drawer */}
       <Drawer
         anchor="right"
         open={isMenuOpen}
