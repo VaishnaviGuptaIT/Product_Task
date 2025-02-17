@@ -12,7 +12,7 @@ import {
 import { styled } from "@mui/material/styles";
 
 const StyledCard = styled(Card)(() => ({
-  height:"320px",
+  height: "320px",
   position: "relative",
   overflow: "hidden",
   borderRadius: "var(--radius-lg)",
@@ -48,8 +48,8 @@ const StyledLink = styled(Link)({
 });
 const CategoryChip = styled(Chip)({
   position: "absolute",
-  top: "0.5rem",
-  left: "0.5rem",
+  top: "1rem",
+  left: "1rem",
   backgroundColor: "var(--color-primary)",
   color: "white",
   zIndex: 1,
@@ -57,8 +57,8 @@ const CategoryChip = styled(Chip)({
 
 const DiscountChip = styled(Chip)({
   position: "absolute",
-  top: "0.5rem",
-  right: "0.5rem",
+  top: "1rem",
+  right: "1rem",
   backgroundColor: "var(--color-success)",
   color: "white",
   zIndex: 1,

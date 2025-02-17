@@ -13,6 +13,10 @@ import {
   InputAdornment,
   Grid,
 } from "@mui/material";
+import {
+  getValidationRules,
+  inputHandlers,
+} from "../../utils/validation";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -33,45 +37,6 @@ const Profile = () => {
       mobile: "",
     },
   });
-  const handleMobileInput = (
-    e:
-      | React.KeyboardEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLInputElement>,
-    onChange: (value: string) => void
-  ) => {
-    if ("key" in e) {
-      if (
-        !/^\d$/.test(e.key) &&
-        !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(
-          e.key
-        )
-      ) {
-        e.preventDefault();
-      }
-    } else {
-      const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-      onChange(value);
-    }
-  };
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === " ") {
-      e.preventDefault();
-    }
-  };
-
-  const handlePaste = (
-    e: React.ClipboardEvent<HTMLInputElement>,
-    field: keyof ProfileFormInputs
-  ) => {
-    e.preventDefault();
-    const pastedText = e.clipboardData.getData("text").replace(/\s/g, "");
-    if (field === "mobile") {
-      const numbersOnly = pastedText.replace(/\D/g, "").slice(0, 10);
-      setValue(field, numbersOnly);
-    } else {
-      setValue(field, pastedText);
-    }
-  };
 
   const fetchUserData = () => {
     const user = getCurrentUser();
@@ -132,36 +97,50 @@ const Profile = () => {
     fetchUserData();
   }, []);
 
-  const inputStyles = {
-    "& .MuiOutlinedInput-root": {
+const inputStyles = {
+  "& .MuiOutlinedInput-root": {
+    backgroundColor: "var(--color-overlay-light)",
+    borderRadius: "var(--radius-lg)",
+    color: "var(--text-color-primary)",
+    transition: "var(--transition-medium)",
+    "& fieldset": {
+      borderColor: "var(--color-overlay-medium)",
+    },
+    "&:hover fieldset": {
+      borderColor: "var(--color-accent)",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "var(--color-primary)",
+      borderWidth: "2px",
+    },
+    "&.Mui-disabled": {
       backgroundColor: "var(--color-overlay-light)",
-      borderRadius: "var(--radius-lg)",
-      color: "var(--text-color-primary)",
-      transition: "var(--transition-medium)",
-      "& fieldset": {
-        borderColor: "var(--color-overlay-medium)",
-      },
-      "&:hover fieldset": {
-        borderColor: "var(--color-accent)",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "var(--color-primary)",
-        borderWidth: "2px",
-      },
     },
-    "& .MuiInputLabel-root": {
-      color: "var(--text-color-secondary)",
-      "&.Mui-focused": {
-        color: "var(--color-primary)",
-      },
+  },
+  "& .MuiInputLabel-root": {
+    color: "var(--text-color-secondary)",
+    "&.Mui-focused": {
+      color: "var(--color-primary)",
     },
-    mb: 2,
-  };
+    "&.Mui-disabled": {
+      color: "var(--color-gray-400)",
+    },
+  },
+  "& .Mui-disabled .MuiInputBase-input": {
+    color: "var(--color-gray-400) !important",
+    "-webkit-text-fill-color": "var(--color-gray-400) !important",
+  },
+  "& .MuiInputBase-input": {
+    color: "var(--text-color-primary)",
+  },
+  mb: 2,
+};
+
 
   return (
     <Box
       sx={{
-        marginTop:"4rem",
+        marginTop: "4rem",
         display: "flex",
         alignItems: "center",
       }}
@@ -236,25 +215,22 @@ const Profile = () => {
                 <Controller
                   name="firstName"
                   control={control}
-                  rules={{
-                    required: "First name is required",
-                    minLength: {
-                      value: 2,
-                      message: "First name must be at least 2 characters",
-                    },
-                    validate: {
-                      noSpaces: (value) =>
-                        !/\s/.test(value) || "First name cannot contain spaces",
-                    },
-                  }}
+                  rules={getValidationRules.name("First name")}
                   render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="First Name"
                       disabled={!isEditing}
-                      onKeyDown={handleKeyDown}
-                      onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => handlePaste(e, "firstName")}
+                      onKeyDown={inputHandlers.handleKeyDown}
+                      onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
+                        inputHandlers.handlePaste(
+                          e,
+                          "firstName",
+                          setValue,
+                          getValues
+                        )
+                      }
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
@@ -282,25 +258,22 @@ const Profile = () => {
                 <Controller
                   name="lastName"
                   control={control}
-                  rules={{
-                    required: "Last name is required",
-                    minLength: {
-                      value: 2,
-                      message: "Last name must be at least 2 characters",
-                    },
-                    validate: {
-                      noSpaces: (value) =>
-                        !/\s/.test(value) || "Last name cannot contain spaces",
-                    },
-                  }}
+                  rules={getValidationRules.name("Last name")}
                   render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Last Name"
                       disabled={!isEditing}
-                      onKeyDown={handleKeyDown}
-                      onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => handlePaste(e, "lastName")}
+                      onKeyDown={inputHandlers.handleKeyDown}
+                      onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
+                        inputHandlers.handlePaste(
+                          e,
+                          "lastName",
+                          setValue,
+                          getValues
+                        )
+                      }
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
@@ -328,25 +301,22 @@ const Profile = () => {
                 <Controller
                   name="email"
                   control={control}
-                  rules={{
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Please enter a valid email address",
-                    },
-                    validate: {
-                      noSpaces: (value) =>
-                        !/\s/.test(value) || "Email cannot contain spaces",
-                    },
-                  }}
+                  rules={getValidationRules.email}
                   render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Email"
                       disabled={!isEditing}
-                      onKeyDown={handleKeyDown}
-                      onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => handlePaste(e, "email")}
+                      onKeyDown={inputHandlers.handleKeyDown}
+                      onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
+                        inputHandlers.handlePaste(
+                          e,
+                          "email",
+                          setValue,
+                          getValues
+                        )
+                      }
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
@@ -374,27 +344,22 @@ const Profile = () => {
                 <Controller
                   name="mobile"
                   control={control}
-                  rules={{
-                    required: "Mobile number is required",
-                    pattern: {
-                      value: /^[0-9]{10}$/,
-                      message: "Please enter a valid 10-digit mobile number",
-                    },
-                    validate: {
-                      noSpaces: (value) =>
-                        !/\s/.test(value) ||
-                        "Mobile number cannot contain spaces",
-                    },
-                  }}
+                  rules={getValidationRules.mobile}
                   render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Mobile"
                       disabled={!isEditing}
-                      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleMobileInput(e, field.onChange)}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleMobileInput(e, field.onChange)}
-                      onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => handlePaste(e, "mobile")}
+                      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
+                        inputHandlers.handleMobileInput(e, setValue)
+                      }
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        inputHandlers.handleMobileInput(e, setValue)
+                      }
+                      onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
+                        inputHandlers.handleMobilePaste(e, setValue)
+                      }
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">

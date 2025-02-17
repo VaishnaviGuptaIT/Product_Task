@@ -17,7 +17,10 @@ import { useDispatch } from "react-redux";
 import { setLogin } from "../../store/slices/authSlice";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-
+import {
+  getValidationRules,
+  inputHandlers,
+} from "../../utils/validation";
 
 const Login = () => {
     const {
@@ -36,21 +39,6 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
- const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-   if (e.key === " ") {
-     e.preventDefault();
-   }
- };
-
- const handlePaste = (
-   e: React.ClipboardEvent<HTMLInputElement>,
-   field: keyof LoginInputs
- ) => {
-   e.preventDefault();
-   const pastedText = e.clipboardData.getData("text").replace(/\s/g, "");
-   setValue(field, getValues(field) + pastedText);
- };
 
  const onSubmit = async (formData: LoginInputs) => {
    try {
@@ -179,28 +167,15 @@ const Login = () => {
             </Typography>
           </Box>
 
-
           <form onSubmit={handleSubmit(onSubmit)}>
             <TextField
               fullWidth
               label="Email"
               placeholder="Enter your email address"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Please enter a valid email address",
-                },
-                validate: {
-                  noSpaces: (value) =>
-                    !/\s/.test(value) || "Email cannot contain spaces",
-                },
-              })}
-              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
-                handleKeyDown(e)
-              }
+              {...register("email", getValidationRules.email)}
+              onKeyDown={inputHandlers.handleKeyDown}
               onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
-                handlePaste(e, "email")
+                inputHandlers.handlePaste(e, "email", setValue, getValues)
               }
               InputProps={{
                 startAdornment: (
@@ -223,39 +198,10 @@ const Login = () => {
               fullWidth
               label="Password"
               placeholder="Enter your password"
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 8,
-                  message: "Password must be at least 8 characters",
-                },
-                maxLength: {
-                  value: 32,
-                  message: "Password must not exceed 32 characters",
-                },
-                validate: {
-                  noSpaces: (value) =>
-                    !/\s/.test(value) || "Password cannot contain spaces",
-                  lowercase: (value) =>
-                    /[a-z]/.test(value) ||
-                    "Password must contain at least one lowercase letter",
-                  uppercase: (value) =>
-                    /[A-Z]/.test(value) ||
-                    "Password must contain at least one uppercase letter",
-                  digit: (value) =>
-                    /\d/.test(value) ||
-                    "Password must contain at least one number",
-                  specialChar: (value) =>
-                    /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value) ||
-                    "Password must contain at least one special character",
-                },
-              })}
-              type={showPassword ? "text" : "password"}
-              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
-                handleKeyDown(e)
-              }
+              {...register("password", getValidationRules.password)}
+              onKeyDown={inputHandlers.handleKeyDown}
               onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
-                handlePaste(e, "password")
+                inputHandlers.handlePaste(e, "password", setValue, getValues)
               }
               InputProps={{
                 startAdornment: (
@@ -355,24 +301,23 @@ const Login = () => {
                 }}
               >
                 Don't have an account?{" "}
-                <Link
-                  to="/signup">
-                <Typography
-                  component="span"
-                  sx={{
-                    color: "var(--color-primary)",
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    transition: "var(--transition-fast)",
-                    "&:hover": {
-                      color: "var(--color-secondary)",
-                      textDecoration: "underline",
-                    },
-                  }}
-                >
-                  Sign up now
-                </Typography>
-                 </Link>
+                <Link to="/signup">
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: "var(--color-primary)",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      transition: "var(--transition-fast)",
+                      "&:hover": {
+                        color: "var(--color-secondary)",
+                        textDecoration: "underline",
+                      },
+                    }}
+                  >
+                    Sign up now
+                  </Typography>
+                </Link>
               </Typography>
             </Box>
           </form>

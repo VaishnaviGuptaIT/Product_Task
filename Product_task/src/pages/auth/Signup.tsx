@@ -25,7 +25,12 @@ import {saveUser } from "../../utils/storage";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { SignupFormInputs, User } from "../../utils/type";
-
+import {
+  VALIDATION_PATTERNS,
+  VALIDATION_MESSAGES,
+  getValidationRules,
+  inputHandlers,
+} from "../../utils/validation";
 
 const Signup = () => {
   const {
@@ -52,53 +57,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const handleMobileInput = (
-    e:
-      | React.KeyboardEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if ("key" in e) {
-      if (
-        !/^\d$/.test(e.key) &&
-        !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(
-          e.key
-        )
-      ) {
-        e.preventDefault();
-      }
-      if (/^\d$/.test(e.key) && e.currentTarget.value.length >= 10) {
-        e.preventDefault();
-      }
-    } else {
-      const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-      setValue("mobile", value);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === " ") {
-      e.preventDefault();
-    }
-  };
-  const handleMobilePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const pastedText = e.clipboardData
-      .getData("text")
-      .replace(/\D/g, "")
-      .slice(0, 10);
-    setValue("mobile", pastedText);
-  };
-
-
-  const handlePaste = (
-    e: React.ClipboardEvent<HTMLInputElement>,
-    field: keyof SignupFormInputs
-  ) => {
-    e.preventDefault();
-    const pastedText = e.clipboardData.getData("text").replace(/\s/g, "");
-    setValue(field, getValues(field) + pastedText);
-  };
-
+ 
   const validatePasswordMatch = (value: string) => {
     const password = watch("password");
     return value === password || "Passwords do not match";
@@ -257,25 +216,26 @@ const Signup = () => {
                   fullWidth
                   label="First Name"
                   placeholder="Enter your first name"
-                  {...register("firstName", {
-                    required: "First name is required",
-                    minLength: {
-                      value: 2,
-                      message: "First name must be at least 2 characters",
-                    },
-                    validate: {
-                      noSpaces: (value) =>
-                        !/\s/.test(value) || "First name cannot contain spaces",
-                    },
-                  })}
-                  onKeyDown={handleKeyDown}
+                  {...register(
+                    "firstName",
+                    getValidationRules.name("First name")
+                  )}
+                  onKeyDown={inputHandlers.handleKeyDown}
                   onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
-                    handlePaste(e, "firstName")
+                    inputHandlers.handlePaste(
+                      e,
+                      "firstName",
+                      setValue,
+                      getValues
+                    )
                   }
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <UserIcon size={20} color="var(--text-color-secondary)" />
+                        <UserIcon
+                          size={20}
+                          color="var(--text-color-secondary)"
+                        />
                       </InputAdornment>
                     ),
                   }}
@@ -295,25 +255,26 @@ const Signup = () => {
                   fullWidth
                   label="Last Name"
                   placeholder="Enter your last name"
-                  {...register("lastName", {
-                    required: "Last name is required",
-                    minLength: {
-                      value: 2,
-                      message: "Last name must be at least 2 characters",
-                    },
-                    validate: {
-                      noSpaces: (value) =>
-                        !/\s/.test(value) || "Last name cannot contain spaces",
-                    },
-                  })}
-                  onKeyDown={handleKeyDown}
+                  {...register(
+                    "lastName",
+                    getValidationRules.name("Last name")
+                  )}
+                  onKeyDown={inputHandlers.handleKeyDown}
                   onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
-                    handlePaste(e, "lastName")
+                    inputHandlers.handlePaste(
+                      e,
+                      "lastName",
+                      setValue,
+                      getValues
+                    )
                   }
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <UserIcon size={20} color="var(--text-color-secondary)" />
+                        <UserIcon
+                          size={20}
+                          color="var(--text-color-secondary)"
+                        />
                       </InputAdornment>
                     ),
                   }}
@@ -333,20 +294,10 @@ const Signup = () => {
                   fullWidth
                   label="Email"
                   placeholder="Enter your email address"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Please enter a valid email address",
-                    },
-                    validate: {
-                      noSpaces: (value) =>
-                        !/\s/.test(value) || "Email cannot contain spaces",
-                    },
-                  })}
-                  onKeyDown={handleKeyDown}
+                  {...register("email", getValidationRules.email)}
+                  onKeyDown={inputHandlers.handleKeyDown}
                   onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
-                    handlePaste(e, "email")
+                    inputHandlers.handlePaste(e, "email", setValue, getValues)
                   }
                   InputProps={{
                     startAdornment: (
@@ -371,21 +322,12 @@ const Signup = () => {
                   fullWidth
                   label="Mobile"
                   placeholder="Enter your mobile number"
-                  {...register("mobile", {
-                    required: "Mobile number is required",
-                    pattern: {
-                      value: /^[0-9]{10}$/,
-                      message: "Please enter a valid 10-digit mobile number",
-                    },
-                    validate: {
-                      noSpaces: (value) =>
-                        !/\s/.test(value) ||
-                        "Mobile number cannot contain spaces",
-                    },
-                  })}
-                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleMobileInput(e)}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleMobileInput(e)}
-                  onPaste={handleMobilePaste}
+                  {...register("mobile", getValidationRules.mobile)}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
+                    inputHandlers.handleMobileInput(e, setValue)
+                  }
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => inputHandlers.handleMobileInput(e, setValue)}
+                  onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => inputHandlers.handleMobilePaste(e, setValue)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -413,36 +355,15 @@ const Signup = () => {
                   label="Password"
                   placeholder="Enter your password"
                   type={showPassword ? "text" : "password"}
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: {
-                      value: 8,
-                      message: "Password must be at least 8 characters",
-                    },
-                    maxLength: {
-                      value: 32,
-                      message: "Password must not exceed 32 characters",
-                    },
-                    validate: {
-                      noSpaces: (value) =>
-                        !/\s/.test(value) || "Password cannot contain spaces",
-                      lowercase: (value) =>
-                        /[a-z]/.test(value) ||
-                        "Password must contain at least one lowercase letter",
-                      uppercase: (value) =>
-                        /[A-Z]/.test(value) ||
-                        "Password must contain at least one uppercase letter",
-                      digit: (value) =>
-                        /\d/.test(value) ||
-                        "Password must contain at least one number",
-                      specialChar: (value) =>
-                        /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value) ||
-                        "Password must contain at least one special character",
-                    },
-                  })}
-                  onKeyDown={handleKeyDown}
+                  {...register("password", getValidationRules.password)}
+                  onKeyDown={inputHandlers.handleKeyDown}
                   onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
-                    handlePaste(e, "password")
+                    inputHandlers.handlePaste(
+                      e,
+                      "password",
+                      setValue,
+                      getValues
+                    )
                   }
                   InputProps={{
                     startAdornment: (
@@ -455,9 +376,7 @@ const Signup = () => {
                         <IconButton
                           onClick={() => setShowPassword((prev) => !prev)}
                           edge="end"
-                          sx={{
-                            color: "var(--text-color-secondary)",
-                          }}
+                          sx={{ color: "var(--text-color-secondary)" }}
                         >
                           {showPassword ? (
                             <EyeOff size={20} />
@@ -486,17 +405,22 @@ const Signup = () => {
                   placeholder="Confirm your password"
                   type={showConfirmPassword ? "text" : "password"}
                   {...register("confirmPassword", {
-                    required: "Confirm password is required",
+                    required: VALIDATION_MESSAGES.REQUIRED("Confirm password"),
                     validate: {
                       passwordMatch: validatePasswordMatch,
                       noSpaces: (value) =>
-                        !/\s/.test(value) ||
-                        "Confirm password cannot contain spaces",
+                        !VALIDATION_PATTERNS.NO_SPACES.test(value) ||
+                        VALIDATION_MESSAGES.NO_SPACES("Confirm password"),
                     },
                   })}
-                  onKeyDown={handleKeyDown}
+                  onKeyDown={inputHandlers.handleKeyDown}
                   onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
-                    handlePaste(e, "confirmPassword")
+                    inputHandlers.handlePaste(
+                      e,
+                      "confirmPassword",
+                      setValue,
+                      getValues
+                    )
                   }
                   InputProps={{
                     startAdornment: (
@@ -511,9 +435,7 @@ const Signup = () => {
                             setShowConfirmPassword((prev) => !prev)
                           }
                           edge="end"
-                          sx={{
-                            color: "var(--text-color-secondary)",
-                          }}
+                          sx={{ color: "var(--text-color-secondary)" }}
                         >
                           {showConfirmPassword ? (
                             <EyeOff size={20} />

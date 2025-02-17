@@ -1,50 +1,97 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Product Task (React + TypeScript + Vite)
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This project is a React-based frontend application built with Vite and TypeScript. It uses Material UI for styling, Redux Toolkit for state management, and React Router for navigation.
 
-## Expanding the ESLint configuration
+Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Ensure you have the following installed:
 
-- Configure the top-level `parserOptions` property like this:
+Node.js: v18.x or later (Recommended)
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Package Manager: npm or yarn
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Installation
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Clone the repository and install dependencies:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+# Clone the repository
+
+git clone [Repository Link](https://github.com/VaishnaviGuptaIT/Product_Task.git)
+cd Product_task
+
+# Install dependencies
+
+npm install
+ or
+yarn install
+
+Running the Development Server
+
+To start the development server:
+
+npm run dev
+ or
+yarn dev
+
+This will launch the app using Vite.
+
+Building the Project
+
+To create a production build:
+
+npm run build
+or
+yarn build
+
+This command runs TypeScript compilation and builds the project using Vite.
+
+Previewing the Build
+
+After building, you can preview the production build using:
+
+npm run preview
+ or
+yarn preview
+
+Linting the Code
+
+To run ESLint and check for any linting issues:
+
+npm run lint
+ or
+yarn lint
+
+Dependencies
+
+Core Dependencies:
+
+React 19 - UI library
+
+React Router - Routing management
+
+Redux Toolkit - State management
+
+Material UI - UI components and styling
+
+Axios - API requests
+
+Formik / React Hook Form - Form management
+
+Development Dependencies:
+
+TypeScript - Type safety
+
+ESLint - Linting
+
+Vite - Build tool
+
+Additional Notes
+
+Ensure you have the correct Node.js version installed.
+
+If you face any issues, check your environment variables and dependencies.
+
+Feel free to update vite.config.ts and tsconfig.json as needed.

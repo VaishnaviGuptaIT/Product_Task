@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Lock, Eye, EyeOff } from "lucide-react";
@@ -13,6 +13,12 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
+import {
+  VALIDATION_PATTERNS,
+  VALIDATION_MESSAGES,
+  getValidationRules,
+  inputHandlers,
+} from "../../utils/validation";
 
 const ChangePassword = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -41,58 +47,47 @@ const ChangePassword = () => {
     const user = JSON.parse(localStorage.getItem("currentUser") || "{}");
     setCurrentUser(user);
   }, []);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === " ") {
-      e.preventDefault();
-    }
-  };
-
-  const handlePaste = (
-    e: React.ClipboardEvent<HTMLInputElement>,
-    field: keyof PasswordFormInputs
-  ) => {
-    e.preventDefault();
-    const pastedText = e.clipboardData.getData("text").replace(/\s/g, "");
-    setValue(field, pastedText);
-  };
-
-  const onSubmit = (data: PasswordFormInputs) => {
-    const { currentPassword, newPassword, confirmPassword } = data;
-
-    if (currentPassword !== decryptPassword(currentUser?.password)) {
-      toast.error("Current password is incorrect");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      toast.error("New passwords do not match");
-      return;
-    }
-
-    const updatedUser = {
-      ...currentUser,
-      password: encryptPassword(newPassword),
-    };
-
-    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const userIndex = users.findIndex(
-      (user: any) => user.email === currentUser.email
+  const validatePasswordMatch = (value: string) => {
+    return (
+      value === watchNewPassword || VALIDATION_MESSAGES.PASSWORDS_DO_NOT_MATCH
     );
-
-    if (userIndex !== -1) {
-      users[userIndex] = updatedUser;
-      localStorage.setItem("users", JSON.stringify(users));
-    }
-
-    toast.success("Password updated successfully!");
-
-    setValue("currentPassword", "");
-    setValue("newPassword", "");
-    setValue("confirmPassword", "");
   };
+ const onSubmit = (data: PasswordFormInputs) => {
+   const { currentPassword, newPassword, confirmPassword } = data;
+
+   if (currentPassword !== decryptPassword(currentUser?.password)) {
+     toast.error(VALIDATION_MESSAGES.INVALID_CREDENTIALS);
+     return;
+   }
+
+   if (newPassword !== confirmPassword) {
+     toast.error(VALIDATION_MESSAGES.PASSWORDS_DO_NOT_MATCH);
+     return;
+   }
+
+   const updatedUser = {
+     ...currentUser,
+     password: encryptPassword(newPassword),
+   };
+
+   localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+
+   const users = JSON.parse(localStorage.getItem("users") || "[]");
+   const userIndex = users.findIndex(
+     (user: any) => user.email === currentUser.email
+   );
+
+   if (userIndex !== -1) {
+     users[userIndex] = updatedUser;
+     localStorage.setItem("users", JSON.stringify(users));
+   }
+
+   toast.success("Password updated successfully!");
+
+   setValue("currentPassword", "");
+   setValue("newPassword", "");
+   setValue("confirmPassword", "");
+ };
 
   const inputStyles = {
     "& .MuiOutlinedInput-root": {
@@ -201,10 +196,11 @@ const ChangePassword = () => {
               name="currentPassword"
               control={control}
               rules={{
-                required: "Current password is required",
+                required: VALIDATION_MESSAGES.REQUIRED("Current password"),
                 validate: {
                   noSpaces: (value) =>
-                    !/\s/.test(value) || "Password cannot contain spaces",
+                    !VALIDATION_PATTERNS.NO_SPACES.test(value) ||
+                    VALIDATION_MESSAGES.NO_SPACES("Current password"),
                 },
               }}
               render={({ field }) => (
@@ -213,9 +209,14 @@ const ChangePassword = () => {
                   label="Current Password"
                   type={showCurrentPassword ? "text" : "password"}
                   {...field}
-                  onKeyDown={handleKeyDown}
-                  onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
-                    handlePaste(e, "currentPassword")
+                  onKeyDown={inputHandlers.handleKeyDown}
+                  onPaste={(e: any) =>
+                    inputHandlers.handlePaste(
+                      e,
+                      "currentPassword",
+                      setValue,
+                      getValues
+                    )
                   }
                   InputProps={{
                     startAdornment: (
@@ -256,42 +257,21 @@ const ChangePassword = () => {
             <Controller
               name="newPassword"
               control={control}
-              rules={{
-                required: "New password is required",
-                minLength: {
-                  value: 8,
-                  message: "Password must be at least 8 characters",
-                },
-                maxLength: {
-                  value: 32,
-                  message: "Password must not exceed 32 characters",
-                },
-                validate: {
-                  noSpaces: (value) =>
-                    !/\s/.test(value) || "Password cannot contain spaces",
-                  lowercase: (value) =>
-                    /[a-z]/.test(value) ||
-                    "Password must contain at least one lowercase letter",
-                  uppercase: (value) =>
-                    /[A-Z]/.test(value) ||
-                    "Password must contain at least one uppercase letter",
-                  digit: (value) =>
-                    /\d/.test(value) ||
-                    "Password must contain at least one number",
-                  specialChar: (value) =>
-                    /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value) ||
-                    "Password must contain at least one special character",
-                },
-              }}
+              rules={getValidationRules.password}
               render={({ field }) => (
                 <TextField
                   fullWidth
                   label="New Password"
                   type={showNewPassword ? "text" : "password"}
                   {...field}
-                  onKeyDown={handleKeyDown}
-                  onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
-                    handlePaste(e, "newPassword")
+                  onKeyDown={inputHandlers.handleKeyDown}
+                  onPaste={(e: any) =>
+                    inputHandlers.handlePaste(
+                      e,
+                      "newPassword",
+                      setValue,
+                      getValues
+                    )
                   }
                   InputProps={{
                     startAdornment: (
@@ -331,12 +311,12 @@ const ChangePassword = () => {
               name="confirmPassword"
               control={control}
               rules={{
-                required: "Please confirm your new password",
+                required: VALIDATION_MESSAGES.REQUIRED("Confirm password"),
                 validate: {
-                  matchesPassword: (value) =>
-                    value === watchNewPassword || "Passwords do not match",
+                  matchesPassword: validatePasswordMatch,
                   noSpaces: (value) =>
-                    !/\s/.test(value) || "Password cannot contain spaces",
+                    !VALIDATION_PATTERNS.NO_SPACES.test(value) ||
+                    VALIDATION_MESSAGES.NO_SPACES("Confirm password"),
                 },
               }}
               render={({ field }) => (
@@ -345,9 +325,14 @@ const ChangePassword = () => {
                   label="Confirm Password"
                   type={showConfirmPassword ? "text" : "password"}
                   {...field}
-                  onKeyDown={handleKeyDown}
-                  onPaste={(e: React.ClipboardEvent<HTMLInputElement>) =>
-                    handlePaste(e, "confirmPassword")
+                  onKeyDown={inputHandlers.handleKeyDown}
+                  onPaste={(e: any) =>
+                    inputHandlers.handlePaste(
+                      e,
+                      "confirmPassword",
+                      setValue,
+                      getValues
+                    )
                   }
                   InputProps={{
                     startAdornment: (
